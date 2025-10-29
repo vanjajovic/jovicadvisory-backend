@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "title": "Kako strast postaje profitabilan biznis",
+  "excerpt": "Putovanje od ideje do uspješne platforme - korak po korak",
+  "content": "Dobrodošli u prvi blog post! Ovo je primjer kako se tekst čuva trajno.\n\nSvaki put kad dodate novi blog post, on će biti sačuvan u JSON fajlu i ostati čak i nakon restartovanja servera.\n\nOvo je drugi paragraf teksta koji demonstrira kako se čuva formatiranje.",
+  "date": "2024-10-15",
+  "published": true,
+  "slug": "kako-strast-postaje-profitabilan-biznis"
+}
