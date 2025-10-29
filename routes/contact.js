@@ -3,13 +3,17 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
-// Test email configuration (bez stvarnog slanja za sada)
+// Email configuration za Outlook
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
+  host: 'smtp-mail.outlook.com',
   port: 587,
+  secure: false,
   auth: {
-    user: 'test@jovicadvisory.com',
-    pass: 'test'
+    user: 'vanja_jovic@outlook.com',
+    pass: process.env.OUTLOOK_PASSWORD // Dodat ćemo ovo u environment variables
+  },
+  tls: {
+    ciphers: 'SSLv3'
   }
 });
 
@@ -26,37 +30,46 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Simulacija čuvanja u bazi (za sada samo console.log)
     console.log('📧 Nova kontakt poruka:');
     console.log('Ime:', name);
     console.log('Email:', email);
     console.log('Telefon:', phone || 'Nije uneseno');
     console.log('Poruka:', message);
-    console.log('Datum:', new Date().toISOString());
-    console.log('---');
 
-    // Simulacija slanja emaila (komentirano za sada)
+    // Email opcije
     const mailOptions = {
-      from: email,
-      to: 'info@jovicadvisory.com',
-      subject: `Nova poruka sa sajta - ${name}`,
+      from: 'vanja_jovic@outlook.com',
+      to: 'vanja_jovic@outlook.com',
+      replyTo: email,
+      subject: `Nova poruka sa sajta Jović Advisory - ${name}`,
       html: `
-        <h3>Nova kontakt poruka</h3>
-        <p><strong>Ime:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Telefon:</strong> ${phone || 'Nije uneseno'}</p>
-        <p><strong>Poruka:</strong></p>
-        <p>${message}</p>
-        <hr>
-        <p>Poruka poslana: ${new Date().toLocaleString()}</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px;">
+          <h2 style="color: #333;">Nova kontakt poruka</h2>
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 5px;">
+            <p><strong>Ime:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Telefon:</strong> ${phone || 'Nije uneseno'}</p>
+            <p><strong>Poruka:</strong></p>
+            <div style="background: white; padding: 15px; border-left: 4px solid #0078d4; margin-top: 10px;">
+              ${message.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+          <hr style="margin: 20px 0;">
+          <p style="color: #666; font-size: 12px;">
+            Poruka poslana sa sajta Jović Advisory: ${new Date().toLocaleString('bs-BA')}
+          </p>
+        </div>
       `
     };
 
-    console.log('📨 Email opcije pripremljene (simulacija):');
-    console.log(mailOptions);
-
-    // U produkciji bi ovdje stvarno slali email
-    // await transporter.sendMail(mailOptions);
+    // Pokušaj poslati email
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('✅ Email uspješno poslan');
+    } catch (emailError) {
+      console.error('❌ Greška pri slanju emaila:', emailError);
+      // Nastavljamo bez emaila, ali logujemo u konzolu
+    }
 
     res.json({
       success: true,
@@ -77,12 +90,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all messages (za admin panel kasnije)
-router.get('/', (req, res) => {
+// Health check za kontakt rutu
+router.get('/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Contact messages endpoint',
-    note: 'Ovdje će se kasnije vraćati sve poruke iz baze'
+    message: 'Contact API radi',
+    timestamp: new Date().toISOString()
   });
 });
 
